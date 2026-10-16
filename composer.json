@@ -1,0 +1,40 @@
+{
+    "name": "tontonpro/contracts",
+    "description": "Contrats partagés des modules TontonPro : faits d'argent, registre de menus, contribution au plan de comptes.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Denis Albert NGANKAM"
+        }
+    ],
+    "require": {
+        "php": "^8.4"
+    },
+    "require-dev": {
+        "pestphp/pest": "^5.3",
+        "phpstan/phpstan": "^2.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "TontonPro\\Contracts\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TontonPro\\Contracts\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "pest",
+        "stan": "phpstan analyse"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
