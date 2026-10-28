@@ -7,7 +7,7 @@ use TontonPro\Contracts\Serialization\FactSerializer;
 use TontonPro\Contracts\Tests\Support\Facts;
 
 it('suit le versionnage sémantique', function () {
-    expect(ContractsVersion::VERSION)->toBe('0.1.0')
+    expect(ContractsVersion::VERSION)->toBe('0.1.1')
         ->and(ContractsVersion::VERSION)->toMatch('/^\d+\.\d+\.\d+$/');
 });
 

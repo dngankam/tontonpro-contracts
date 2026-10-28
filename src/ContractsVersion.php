@@ -11,7 +11,7 @@ namespace TontonPro\Contracts;
  */
 final class ContractsVersion
 {
-    public const string VERSION = '0.1.0';
+    public const string VERSION = '0.1.1';
 
     public const int FACT_SCHEMA = 1;
 }

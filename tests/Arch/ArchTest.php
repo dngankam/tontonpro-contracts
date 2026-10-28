@@ -25,6 +25,8 @@ arch('objets de valeur, faits et composants sont immuables', function () {
         'TontonPro\Contracts\Serialization\PayloadReader',
         'TontonPro\Contracts\Menu\MenuGroup',
         'TontonPro\Contracts\Menu\MenuEntry',
+        'TontonPro\Contracts\Dashboard\DashboardPanel',
+        'TontonPro\Contracts\Dashboard\DashboardFigure',
         'TontonPro\Contracts\Vocabulary\CreditNoteReason',
         'TontonPro\Contracts\Vocabulary\CancellationReason',
         'TontonPro\Contracts\Vocabulary\AdjustmentReason',

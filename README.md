@@ -8,6 +8,7 @@ Il définit :
 
 - les **faits d'argent** qu'un module annonce (vente réalisée, encaissement, avoir…) ;
 - le **registre de menus** où chaque module ajoute ses entrées ;
+- le **tableau de bord** où chaque module pose ses panneaux d'indicateurs ;
 - la **contribution au plan de comptes** qu'un module déclare ;
 - la question **« ces deux établissements appartiennent-ils à la même société ? »**.
 
@@ -136,6 +137,8 @@ compléter sans nouvelle version. Les sept motifs d'avoir sont arrêtés.
 
 ## Menu, plan de comptes, « même société », version
 
+Le tableau de bord a sa propre section, plus bas.
+
 - `MenuRegistry` : chaque module ajoute ses groupes et ses entrées ; un groupe
   déjà déclaré n'est jamais écrasé ; une entrée garde son propriétaire et son
   droit, même dans le groupe d'un autre module. L'hôte filtre par ses droits,
@@ -150,10 +153,90 @@ compléter sans nouvelle version. Les sept motifs d'avoir sont arrêtés.
 
 Les modules cités en exemple (RestoPro, HotelPro) ne sont que des exemples.
 
+## Contribuer au tableau de bord
+
+Même forme que le menu : l'hôte crée un `DashboardBoard` par affichage, appelle
+chaque `DashboardContributor` inscrit, puis filtre les panneaux par leur droit.
+L'hôte n'appelle jamais un module directement et ne calcule aucun chiffre.
+
+- `DashboardPanel` : clé préfixée par le propriétaire (`hotelpro.desk`), titre
+  (clé de traduction), **droit obligatoire**, au moins un indicateur (libellés
+  distincts), rang, lien facultatif (route **et** libellé, ou aucun), sous-titre
+  déjà résolu (le nom du site) et journée à laquelle se rapportent les chiffres.
+- `DashboardFigure` : un libellé et une nature (`DashboardFigureKind`, régime B) :
+  `count` et `percent_bp` (entier ≥ 0, points de base : 8 250 = 82,50 %),
+  `money` (entier ≥ 0 en unité mineure **avec sa devise et ses décimales**, comme
+  un fait ; deux devises ne se somment jamais : deux indicateurs), `business_date`
+  (une journée `AAAA-MM-JJ`, sans fuseau). Indication et route facultatives.
+- **Aucune heure murale** : le contributeur reçoit un instant UTC (`UtcInstant`)
+  et l'identifiant de l'utilisateur de l'hôte ; il lit lui-même le fuseau et la
+  journée de son établissement.
+- Un panneau en double est refusé (`DASHBOARD_PANEL_TAKEN`) ; un refus n'efface
+  aucun panneau déjà posé. Un tableau vide n'est pas une erreur : l'hôte montre
+  son propre message, ou envoie l'utilisateur ailleurs (un vendeur sur sa caisse).
+
+Un module :
+
+```php
+use TontonPro\Contracts\Dashboard\{DashboardBoard, DashboardContributor, DashboardFigure, DashboardPanel};
+use TontonPro\Contracts\Value\{BusinessDate, Money, UtcInstant};
+
+final class HotelDashboard implements DashboardContributor
+{
+    public function contributeTo(DashboardBoard $board, int $userId, UtcInstant $now): void
+    {
+        foreach ($this->sitesOf($userId) as $site) { // ses propres données ; aucun site : aucun panneau
+            $board->addPanel(new DashboardPanel(
+                key: 'hotelpro.desk.'.$site->id,
+                owner: 'hotelpro',
+                titleKey: 'hotelpro::dashboard.desk',
+                ability: 'hotelpro.ledger.view',
+                figures: [
+                    DashboardFigure::percentBasisPoints('hotelpro::dashboard.occupancy', $site->occupancyBp($now)),
+                    DashboardFigure::count('hotelpro::dashboard.arrivals_expected', $site->arrivalsExpected($now)),
+                    DashboardFigure::money('hotelpro::dashboard.collected', new Money($site->collected($now), $site->currency())),
+                    DashboardFigure::businessDate('hotelpro::dashboard.day_to_close', new BusinessDate($site->openDay())),
+                ],
+                order: 10,
+                routeName: 'hotelpro.ledger',
+                linkTitleKey: 'hotelpro::nav.ledger',
+                subtitle: $site->name,
+                businessDate: new BusinessDate($site->businessDay($now)),
+            ));
+        }
+    }
+}
+```
+
+L'hôte :
+
+```php
+$board = new DashboardBoard();
+$now = new UtcInstant(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
+
+foreach ($contributors as $contributor) { // les contributeurs inscrits ; aucun : tableau vide
+    try {
+        $contributor->contributeTo($board, $user->id, $now);
+    } catch (ContractViolation $violation) {
+        report($violation); // un module fautif ne retire pas les panneaux des autres
+    }
+}
+
+$panels = $board->visibleFor(fn (string $ability): bool => $user->can($ability));
+// [] : l'hôte montre son message utile. Sinon : traduire les clés, résoudre les routes, formater selon `kind`.
+```
+
 ## Versions
 
 Versionnage sémantique. Le paquet passe en 1.0 dès qu'un contrat sert deux
 modules. Tout changement de forme d'un fait sérialisé incrémente `FACT_SCHEMA`.
+
+- **0.1.1** — ajout pur : contrat du tableau de bord (`TontonPro\Contracts\Dashboard`),
+  l'énumération fermée `DashboardFigureKind` (une nature décide de la lecture de
+  la valeur : elle ne peut pas être ouverte) et cinq codes `DASHBOARD_*`. Aucune
+  signature existante ne change ; `FACT_SCHEMA` reste 1. Une contrainte `^0.1`
+  la prend.
+- **0.1.0** — faits d'argent, registre de menus, plan de comptes, « même société ».
 
 ## Développement
 

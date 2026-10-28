@@ -22,6 +22,21 @@ function violation(callable $build): ?ViolationCode
 }
 
 /**
+ * Le code ET le champ fautif de l'invariant rompu par `$build` (« CODE@champ »),
+ * ou `null` s'il n'en rompt aucun.
+ */
+function violationAt(callable $build): ?string
+{
+    try {
+        $build();
+    } catch (ContractViolation $violation) {
+        return $violation->violation->value.'@'.$violation->field;
+    }
+
+    return null;
+}
+
+/**
  * Le chemin fautif d'une relecture refusée, ou `null` si elle passe.
  */
 function malformedPath(callable $read): ?string

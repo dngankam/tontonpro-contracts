@@ -1,7 +1,8 @@
 # CLAUDE.md — tontonpro/contracts
 
 Contrats partagés des modules TontonPro : faits d'argent, registre de menus,
-contribution au plan de comptes, question « même société ». Paquet PHP pur.
+tableau de bord, contribution au plan de comptes, question « même société ».
+Paquet PHP pur.
 
 ## Interdits
 
@@ -15,7 +16,8 @@ contribution au plan de comptes, question « même société ». Paquet PHP pur.
 ## Conventions
 
 - `declare(strict_types=1)` partout ; toutes les classes `final`, aucune abstraite.
-- Objets de valeur et faits : `final readonly class`. Seul `MenuRegistry` est mutable.
+- Objets de valeur et faits : `final readonly class`. Seuls les registres `MenuRegistry` et
+  `DashboardBoard` sont mutables.
 - Identifiants, propriétés et codes en anglais ; docblocks, README et messages en français.
 - Montants : `int` en unité mineure, toujours ≥ 0, devise ISO avec ses décimales ;
   le sens est porté explicitement. Aucun flottant (taux et quantités en chaînes).

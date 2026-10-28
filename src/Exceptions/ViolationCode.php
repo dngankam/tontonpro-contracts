@@ -113,4 +113,11 @@ enum ViolationCode: string
     case AccountParentInvalid = 'ACCOUNT_PARENT_INVALID';
     case AccountsEmpty = 'ACCOUNTS_EMPTY';
     case AccountContributionInvalid = 'ACCOUNT_CONTRIBUTION_INVALID';
+
+    // Tableau de bord (0.1.1)
+    case DashboardKeyNotOwned = 'DASHBOARD_KEY_NOT_OWNED';
+    case DashboardPanelMalformed = 'DASHBOARD_PANEL_MALFORMED';
+    case DashboardPanelWithoutAbility = 'DASHBOARD_PANEL_WITHOUT_ABILITY';
+    case DashboardPanelTaken = 'DASHBOARD_PANEL_TAKEN';
+    case DashboardFigureMalformed = 'DASHBOARD_FIGURE_MALFORMED';
 }
